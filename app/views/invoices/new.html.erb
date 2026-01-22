@@ -1,0 +1,91 @@
+<% content_for(:title) { "New Invoice - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">New Invoice</h1>
+</div>
+
+<% if @client.nil? %>
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Select Client</h2>
+    </div>
+    <div class="card__body">
+      <% if @clients.any? %>
+        <p class="mb-4">Choose a client with uninvoiced time:</p>
+        <div class="flex gap-2" style="flex-wrap: wrap;">
+          <% @clients.each do |client| %>
+            <%= link_to client.name, new_invoice_path(client_id: client.id), class: "btn btn--secondary" %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty">
+          <p class="empty__title">No uninvoiced time</p>
+          <p class="empty__text">Track some time first, then come back to create an invoice.</p>
+          <%= link_to "Track Time", time_entries_path, class: "btn btn--primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Select Time Entries for <%= @client.name %></h2>
+    </div>
+    <div class="card__body">
+      <% if @uninvoiced_entries.any? %>
+        <%= form_tag invoices_path, method: :post, data: { controller: "invoice-selection" } do %>
+          <%= hidden_field_tag :client_id, @client.id %>
+
+          <div class="mb-4">
+            <label class="flex flex-center gap-2">
+              <input type="checkbox" data-invoice-selection-target="selectAll" data-action="change->invoice-selection#toggleAll">
+              <strong>Select All</strong>
+            </label>
+          </div>
+
+          <ul class="entry-list mb-4">
+            <% @uninvoiced_entries.each do |entry| %>
+              <li class="entry">
+                <label class="flex flex-center gap-4" style="flex: 1;">
+                  <%= check_box_tag "time_entry_ids[]", entry.id, false, data: { invoice_selection_target: "entry", action: "change->invoice-selection#updateTotal" } %>
+                  <div class="entry__main">
+                    <div class="entry__project">
+                      <%= entry.project.name %>
+                    </div>
+                    <div class="entry__description">
+                      <%= entry.description.presence || "No description" %>
+                    </div>
+                    <div class="entry__meta">
+                      <%= entry.date.strftime("%b %d, %Y") %>
+                    </div>
+                  </div>
+                </label>
+                <div class="entry__hours" data-hours="<%= entry.hours %>" data-rate="<%= entry.hourly_rate %>">
+                  <%= number_with_precision(entry.hours, precision: 2) %>h
+                </div>
+              </li>
+            <% end %>
+          </ul>
+
+          <div class="card__footer flex flex-between flex-center">
+            <div>
+              <strong>Selected:</strong>
+              <span data-invoice-selection-target="total">$0.00</span>
+            </div>
+            <%= submit_tag "Create Invoice", class: "btn btn--primary" %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="empty">
+          <p class="empty__title">No uninvoiced time for this client</p>
+          <p class="empty__text">Track some time first, then come back to create an invoice.</p>
+          <%= link_to "Track Time", time_entries_path, class: "btn btn--primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<p class="mt-4">
+  <%= link_to "Back to invoices", invoices_path %>
+</p>

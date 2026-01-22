@@ -1,0 +1,86 @@
+<% content_for(:title) { "Invoice #{@invoice.number} - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">Invoice <%= @invoice.number %></h1>
+  <div class="page-header__actions">
+    <% if @invoice.draft? %>
+      <%= link_to "Edit", edit_invoice_path(@invoice), class: "btn btn--secondary" %>
+      <%= button_to "Send Invoice", send_invoice_invoice_path(@invoice), method: :post, class: "btn btn--primary", data: { turbo_confirm: "Send this invoice to #{@invoice.client.email}?" } %>
+    <% elsif @invoice.sent? %>
+      <%= button_to "Mark as Paid", mark_paid_invoice_path(@invoice), method: :post, class: "btn btn--primary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="invoice-preview">
+  <div class="invoice-preview__header">
+    <div>
+      <h2 class="invoice-preview__title">INVOICE</h2>
+      <p class="invoice-preview__number"><%= @invoice.number %></p>
+    </div>
+    <div class="invoice-preview__status">
+      <span class="badge badge--<%= @invoice.status %> badge--lg"><%= @invoice.status.upcase %></span>
+      <% if @invoice.overdue? %>
+        <span class="badge badge--overdue badge--lg">OVERDUE</span>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="invoice-preview__meta">
+    <div class="invoice-preview__dates">
+      <p><strong>Issue Date:</strong> <%= @invoice.issued_at.strftime("%B %d, %Y") %></p>
+      <p><strong>Due Date:</strong> <%= @invoice.due_at.strftime("%B %d, %Y") %></p>
+    </div>
+    <div class="invoice-preview__client">
+      <p class="text-muted text-sm">Bill To:</p>
+      <p><strong><%= @invoice.client.name %></strong></p>
+      <% if @invoice.client.email.present? %>
+        <p class="text-muted"><%= @invoice.client.email %></p>
+      <% end %>
+      <% if @invoice.client.address.present? %>
+        <p class="text-sm"><%= simple_format(@invoice.client.address) %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <table class="invoice-preview__table">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="num">Hours</th>
+        <th class="num">Rate</th>
+        <th class="num">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @invoice.line_items.each do |item| %>
+        <tr>
+          <td><%= item.description %></td>
+          <td class="num"><%= number_with_precision(item.quantity, precision: 2) %></td>
+          <td class="num"><%= number_to_currency(item.unit_price) %></td>
+          <td class="num"><%= number_to_currency(item.total) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="invoice-preview__total">
+    <span>Total</span>
+    <span class="invoice-preview__total-amount"><%= number_to_currency(@invoice.total) %></span>
+  </div>
+
+  <% if @invoice.notes.present? %>
+    <div class="invoice-preview__notes">
+      <p class="text-muted text-sm">Notes:</p>
+      <p><%= simple_format(@invoice.notes) %></p>
+    </div>
+  <% end %>
+
+  <div class="invoice-preview__footer">
+    Thank you for your business!
+  </div>
+</div>
+
+<p class="mt-6">
+  <%= link_to "Back to invoices", invoices_path %>
+</p>

@@ -1,0 +1,61 @@
+<% content_for(:title) { "Invoices - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">Invoices</h1>
+  <div class="page-header__actions">
+    <%= link_to "New Invoice", new_invoice_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<div class="flex gap-2 mb-4">
+  <%= link_to "All", invoices_path, class: "btn #{@status_filter.nil? ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
+  <%= link_to "Draft", invoices_path(status: "draft"), class: "btn #{@status_filter == 'draft' ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
+  <%= link_to "Sent", invoices_path(status: "sent"), class: "btn #{@status_filter == 'sent' ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
+  <%= link_to "Paid", invoices_path(status: "paid"), class: "btn #{@status_filter == 'paid' ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
+</div>
+
+<% if @invoices.any? %>
+  <div class="card card--flush">
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Due</th>
+            <th>Status</th>
+            <th class="num">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @invoices.each do |invoice| %>
+            <tr>
+              <td><%= link_to invoice.number, invoice %></td>
+              <td><%= invoice.client.name %></td>
+              <td><%= invoice.issued_at.strftime("%b %d, %Y") %></td>
+              <td>
+                <%= invoice.due_at.strftime("%b %d, %Y") %>
+                <% if invoice.overdue? %>
+                  <span class="badge badge--overdue">Overdue</span>
+                <% end %>
+              </td>
+              <td>
+                <span class="badge badge--<%= invoice.status %>"><%= invoice.status %></span>
+              </td>
+              <td class="num"><%= number_to_currency(invoice.total) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card">
+    <div class="empty">
+      <p class="empty__title">No invoices yet</p>
+      <p class="empty__text">Create your first invoice from a client's uninvoiced time.</p>
+      <%= link_to "Create Invoice", new_invoice_path, class: "btn btn--primary" %>
+    </div>
+  </div>
+<% end %>

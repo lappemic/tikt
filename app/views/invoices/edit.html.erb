@@ -1,0 +1,78 @@
+<% content_for(:title) { "Edit Invoice #{@invoice.number} - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">Edit Invoice <%= @invoice.number %></h1>
+</div>
+
+<div class="card mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Invoice Details</h2>
+  </div>
+  <div class="card__body">
+    <%= form_with model: @invoice do |f| %>
+      <div class="form-row">
+        <div class="form-group">
+          <%= f.label :issued_at, "Issue Date", class: "form-label" %>
+          <%= f.date_field :issued_at, class: "form-input" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :due_at, "Due Date", class: "form-label" %>
+          <%= f.date_field :due_at, class: "form-input" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :notes, class: "form-label" %>
+        <%= f.text_area :notes, class: "form-textarea", rows: 3, placeholder: "Payment terms, thank you message, etc..." %>
+      </div>
+
+      <div class="flex gap-2">
+        <%= f.submit "Save Changes", class: "btn btn--primary" %>
+        <%= link_to "Cancel", @invoice, class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card card--flush mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Line Items</h2>
+  </div>
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="num">Hours</th>
+          <th class="num">Rate</th>
+          <th class="num">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @line_items.each do |item| %>
+          <tr>
+            <td><%= item.description %></td>
+            <td class="num"><%= number_with_precision(item.quantity, precision: 2) %></td>
+            <td class="num"><%= number_to_currency(item.unit_price) %></td>
+            <td class="num"><%= number_to_currency(item.total) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="3" class="text-right">Total</th>
+          <th class="num" style="font-size: var(--text-lg);"><%= number_to_currency(@invoice.total) %></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="card__footer flex flex-between flex-center">
+    <span class="text-muted">For <%= @invoice.client.name %></span>
+    <%= button_to "Send Invoice", send_invoice_invoice_path(@invoice), method: :post, class: "btn btn--primary", data: { turbo_confirm: "Send this invoice to #{@invoice.client.email}?" } %>
+  </div>
+</div>
+
+<p class="mt-4">
+  <%= button_to "Delete Invoice", @invoice, method: :delete, class: "btn btn--danger", data: { turbo_confirm: "Delete this invoice? Time entries will be marked as uninvoiced again." } %>
+</p>

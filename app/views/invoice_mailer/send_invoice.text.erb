@@ -1,0 +1,18 @@
+Invoice <%= @invoice.number %>
+============================
+
+Hi <%= @client.name.split.first %>,
+
+Please find attached your invoice for recent work.
+
+Total: <%= number_to_currency(@invoice.total) %>
+
+Invoice Details:
+- Invoice Number: <%= @invoice.number %>
+- Issue Date: <%= @invoice.issued_at.strftime("%B %d, %Y") %>
+- Due Date: <%= @invoice.due_at.strftime("%B %d, %Y") %>
+
+Thank you for your business!
+
+---
+This invoice was sent from Tikt.
