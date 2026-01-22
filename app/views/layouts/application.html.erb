@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title><%= content_for(:title) || "Tikt" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -11,19 +11,48 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <%= yield %>
+    <div class="app">
+      <nav class="nav">
+        <div class="container nav__inner">
+          <%= link_to "Tikt", root_path, class: "nav__brand" %>
+          <ul class="nav__links">
+            <li>
+              <%= link_to "Dashboard", root_path, class: "nav__link #{current_page?(root_path) ? 'nav__link--active' : ''}" %>
+            </li>
+            <li>
+              <%= link_to "Time", time_entries_path, class: "nav__link #{controller_name == 'time_entries' ? 'nav__link--active' : ''}" %>
+            </li>
+            <li>
+              <%= link_to "Clients", clients_path, class: "nav__link #{controller_name == 'clients' ? 'nav__link--active' : ''}" %>
+            </li>
+            <li>
+              <%= link_to "Invoices", invoices_path, class: "nav__link #{controller_name == 'invoices' ? 'nav__link--active' : ''}" %>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <main class="app__main">
+        <div class="container">
+          <% if flash[:notice] %>
+            <div class="flash flash--notice"><%= flash[:notice] %></div>
+          <% end %>
+          <% if flash[:alert] %>
+            <div class="flash flash--alert"><%= flash[:alert] %></div>
+          <% end %>
+
+          <%= yield %>
+        </div>
+      </main>
+    </div>
   </body>
 </html>
