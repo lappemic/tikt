@@ -1,0 +1,19 @@
+design:
+  project: website_redesign
+  name: Design Phase
+  description: UI/UX design work
+  budget_cents: 500000
+  status: accepted
+
+development:
+  project: website_redesign
+  name: Development Phase
+  description: Frontend and backend development
+  budget_cents: 1000000
+  status: accepted
+
+testing:
+  project: website_redesign
+  name: Testing Phase
+  description: QA and testing
+  status: offered

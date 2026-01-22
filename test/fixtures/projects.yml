@@ -1,0 +1,20 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  client: one
+  name: MyString
+  hourly_rate: 9.99
+  status: rejected
+
+two:
+  client: two
+  name: MyString
+  hourly_rate: 9.99
+  status: offered
+
+website_redesign:
+  client: one
+  name: Website Redesign
+  hourly_rate: 150.00
+  budget_cents: 500000
+  status: accepted
