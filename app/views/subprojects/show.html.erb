@@ -1,0 +1,93 @@
+<% content_for(:title) { "#{@subproject.name} - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title"><%= @subproject.name %></h1>
+  <div class="page-header__actions">
+    <%= link_to "Edit", edit_subproject_path(@subproject), class: "btn btn--secondary" %>
+  </div>
+</div>
+
+<p class="mb-4">
+  <%= link_to @subproject.project.client.name, @subproject.project.client %> /
+  <%= link_to @subproject.project.name, @subproject.project %>
+  <%= render "shared/status_badge", status: @subproject.status %>
+</p>
+
+<% if @subproject.description.present? %>
+  <p class="mb-4 text-muted"><%= @subproject.description %></p>
+<% end %>
+
+<div class="stats mb-6">
+  <div class="stat">
+    <div class="stat__value"><%= number_to_currency(@subproject.total_cost) %></div>
+    <div class="stat__label">Total cost</div>
+  </div>
+  <% if @subproject.budget.present? %>
+    <div class="stat">
+      <div class="stat__value"><%= number_to_currency(@subproject.budget) %></div>
+      <div class="stat__label">Budget</div>
+    </div>
+    <div class="stat">
+      <div class="stat__value <%= @subproject.budget_remaining < 0 ? 'text-danger' : '' %>">
+        <%= number_to_currency(@subproject.budget_remaining) %>
+      </div>
+      <div class="stat__label">Remaining</div>
+    </div>
+    <div class="stat">
+      <div class="stat__value <%= @subproject.budget_percentage_used > 100 ? 'text-danger' : '' %>">
+        <%= @subproject.budget_percentage_used %>%
+      </div>
+      <div class="stat__label">Used</div>
+    </div>
+  <% end %>
+  <div class="stat">
+    <div class="stat__value"><%= number_with_precision(@subproject.total_hours, precision: 1) %></div>
+    <div class="stat__label">Hours worked</div>
+  </div>
+</div>
+
+<% if @subproject.budget.present? %>
+  <div class="card mb-6">
+    <div class="card__body">
+      <div class="progress-bar">
+        <% percentage = [@subproject.budget_percentage_used, 100].min %>
+        <div class="progress-bar__fill <%= @subproject.budget_percentage_used > 100 ? 'progress-bar__fill--danger' : '' %>" style="width: <%= percentage %>%"></div>
+      </div>
+      <p class="text-sm text-muted mt-2">
+        <% if @subproject.budget_remaining >= 0 %>
+          <%= number_to_currency(@subproject.budget_remaining) %> remaining of <%= number_to_currency(@subproject.budget) %> budget
+        <% else %>
+          <%= number_to_currency(@subproject.budget_remaining.abs) %> over budget
+        <% end %>
+      </p>
+    </div>
+  </div>
+<% end %>
+
+<% if @time_entries.any? %>
+  <div class="card card--flush">
+    <div class="card__header">
+      <h2 class="card__title">Time Entries</h2>
+    </div>
+    <div class="card__body">
+      <ul class="entry-list">
+        <% @time_entries.each do |entry| %>
+          <%= render "time_entries/entry", entry: entry %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% else %>
+  <div class="card">
+    <div class="card__body">
+      <div class="empty">
+        <p class="empty__title">No time entries yet</p>
+        <p class="empty__text">Log time with this subproject selected.</p>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<p class="mt-6">
+  <%= link_to "Back to project", @subproject.project %>
+</p>

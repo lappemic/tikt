@@ -1,0 +1,11 @@
+<% content_for(:title) { "New Project - #{@client.name} - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">New Project for <%= @client.name %></h1>
+</div>
+
+<div class="card">
+  <div class="card__body">
+    <%= render "form", project: @project %>
+  </div>
+</div>

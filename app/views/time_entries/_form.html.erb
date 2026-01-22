@@ -1,0 +1,37 @@
+<%= form_with model: time_entry, class: "form-inline", data: { controller: "time-entry-form", action: "turbo:submit-end->time-entry-form#reset" } do |f| %>
+  <div class="form-group" style="flex: 2;">
+    <%= f.label :project_id, "Project", class: "form-label" %>
+    <%= f.collection_select :project_id, Project.active.includes(:client).order("clients.name, projects.name"), :id, ->(p) { "#{p.client.name} / #{p.name}" }, { prompt: "Select project..." }, { class: "form-select", data: { action: "change->time-entry-form#projectChanged" } } %>
+    <% if time_entry.errors[:project_id].any? %>
+      <p class="form-error"><%= time_entry.errors[:project_id].first %></p>
+    <% end %>
+  </div>
+
+  <div class="form-group" style="flex: 1;">
+    <%= f.label :subproject_id, "Subproject", class: "form-label" %>
+    <%= f.select :subproject_id,
+        time_entry.project&.subprojects&.active&.order(:name)&.map { |sp| [sp.name, sp.id] } || [],
+        { include_blank: "No Subproject" },
+        { class: "form-select", data: { "time-entry-form-target": "subproject" } } %>
+  </div>
+
+  <div class="form-group" style="flex: 1; min-width: 120px;">
+    <%= f.label :date, class: "form-label" %>
+    <%= f.date_field :date, class: "form-input", value: time_entry.date || Date.current %>
+  </div>
+
+  <div class="form-group" style="flex: 0 0 80px;">
+    <%= f.label :hours, class: "form-label" %>
+    <%= f.number_field :hours, class: "form-input", step: 0.25, min: 0.25, placeholder: "0.0" %>
+    <% if time_entry.errors[:hours].any? %>
+      <p class="form-error"><%= time_entry.errors[:hours].first %></p>
+    <% end %>
+  </div>
+
+  <div class="form-group" style="flex: 3;">
+    <%= f.label :description, class: "form-label" %>
+    <%= f.text_field :description, class: "form-input", placeholder: "What did you work on?" %>
+  </div>
+
+  <%= f.submit time_entry.new_record? ? "Log Time" : "Update", class: "btn btn--primary" %>
+<% end %>

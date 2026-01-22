@@ -1,0 +1,141 @@
+<% content_for(:title) { "#{@project.name} - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title"><%= @project.name %></h1>
+  <div class="page-header__actions">
+    <%= link_to "Edit", edit_project_path(@project), class: "btn btn--secondary" %>
+    <%= link_to "New Subproject", new_project_subproject_path(@project), class: "btn btn--primary" %>
+  </div>
+</div>
+
+<p class="mb-4">
+  <%= link_to @project.client.name, @project.client %> &middot;
+  <%= number_to_currency(@project.effective_hourly_rate) %>/hr
+  <%= render "shared/status_badge", status: @project.status %>
+</p>
+
+<div class="stats mb-6">
+  <div class="stat">
+    <div class="stat__value"><%= number_to_currency(@project.total_cost) %></div>
+    <div class="stat__label">Total cost</div>
+  </div>
+  <% if @project.budget.present? %>
+    <div class="stat">
+      <div class="stat__value"><%= number_to_currency(@project.budget) %></div>
+      <div class="stat__label">Budget</div>
+    </div>
+    <div class="stat">
+      <div class="stat__value <%= @project.budget_remaining < 0 ? 'text-danger' : '' %>">
+        <%= number_to_currency(@project.budget_remaining) %>
+      </div>
+      <div class="stat__label">Remaining</div>
+    </div>
+    <div class="stat">
+      <div class="stat__value <%= @project.budget_percentage_used > 100 ? 'text-danger' : '' %>">
+        <%= @project.budget_percentage_used %>%
+      </div>
+      <div class="stat__label">Used</div>
+    </div>
+  <% end %>
+  <div class="stat">
+    <div class="stat__value"><%= number_with_precision(@project.total_hours, precision: 1) %></div>
+    <div class="stat__label">Hours worked</div>
+  </div>
+</div>
+
+<% if @project.budget.present? %>
+  <div class="card mb-6">
+    <div class="card__body">
+      <div class="progress-bar">
+        <% percentage = [@project.budget_percentage_used, 100].min %>
+        <div class="progress-bar__fill <%= @project.budget_percentage_used > 100 ? 'progress-bar__fill--danger' : '' %>" style="width: <%= percentage %>%"></div>
+      </div>
+      <p class="text-sm text-muted mt-2">
+        <% if @project.budget_remaining >= 0 %>
+          <%= number_to_currency(@project.budget_remaining) %> remaining of <%= number_to_currency(@project.budget) %> budget
+        <% else %>
+          <%= number_to_currency(@project.budget_remaining.abs) %> over budget
+        <% end %>
+      </p>
+    </div>
+  </div>
+<% end %>
+
+<div class="card mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Subprojects</h2>
+  </div>
+  <% if @subprojects.any? %>
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th class="num">Hours</th>
+            <th class="num">Cost</th>
+            <th class="num">Budget</th>
+            <th class="num">Remaining</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @subprojects.each do |sp| %>
+            <tr>
+              <td>
+                <%= link_to sp.name, sp %>
+                <%= render "shared/status_badge", status: sp.status %>
+              </td>
+              <td class="num"><%= number_with_precision(sp.total_hours, precision: 1) %>h</td>
+              <td class="num"><%= number_to_currency(sp.total_cost) %></td>
+              <td class="num">
+                <% if sp.budget.present? %>
+                  <%= number_to_currency(sp.budget) %>
+                <% else %>
+                  -
+                <% end %>
+              </td>
+              <td class="num">
+                <% if sp.budget_remaining.present? %>
+                  <span class="<%= sp.budget_remaining < 0 ? 'text-danger' : '' %>">
+                    <%= number_to_currency(sp.budget_remaining) %>
+                  </span>
+                <% else %>
+                  -
+                <% end %>
+              </td>
+              <td>
+                <%= link_to "Edit", edit_subproject_path(sp), class: "btn btn--ghost btn--sm" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="card__body">
+      <div class="empty">
+        <p class="empty__title">No subprojects yet</p>
+        <%= link_to "Add Subproject", new_project_subproject_path(@project), class: "btn btn--primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<% if @time_entries.any? %>
+  <div class="card card--flush">
+    <div class="card__header">
+      <h2 class="card__title">Recent Time Entries</h2>
+    </div>
+    <div class="card__body">
+      <ul class="entry-list">
+        <% @time_entries.each do |entry| %>
+          <%= render "time_entries/entry", entry: entry %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>
+
+<p class="mt-6">
+  <%= link_to "Back to client", @project.client %>
+</p>

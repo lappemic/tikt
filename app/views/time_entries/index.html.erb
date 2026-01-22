@@ -1,0 +1,38 @@
+<% content_for(:title) { "Time Entries - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">Time Entries</h1>
+</div>
+
+<div class="card mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Log Time</h2>
+  </div>
+  <div class="card__body">
+    <%= turbo_frame_tag "new_time_entry" do %>
+      <%= render "form", time_entry: TimeEntry.new(date: Date.current) %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card card--flush">
+  <div class="card__header">
+    <h2 class="card__title">All Entries</h2>
+  </div>
+  <div class="card__body">
+    <%= turbo_frame_tag "time_entries" do %>
+      <% if @time_entries.any? %>
+        <ul class="entry-list">
+          <% @time_entries.each do |entry| %>
+            <%= render "entry", entry: entry %>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="empty">
+          <p class="empty__title">No time entries yet</p>
+          <p class="empty__text">Start tracking your time using the form above.</p>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

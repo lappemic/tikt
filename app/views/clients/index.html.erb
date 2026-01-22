@@ -1,0 +1,47 @@
+<% content_for(:title) { "Clients - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">Clients</h1>
+  <div class="page-header__actions">
+    <%= link_to "New Client", new_client_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<% if @clients.any? %>
+  <div class="card card--flush">
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Projects</th>
+            <th class="num">Rate</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @clients.each do |client| %>
+            <tr>
+              <td><%= link_to client.name, client %></td>
+              <td class="text-muted"><%= client.email %></td>
+              <td><%= client.projects.count %></td>
+              <td class="num"><%= number_to_currency(client.hourly_rate) %>/hr</td>
+              <td>
+                <%= link_to "Edit", edit_client_path(client), class: "btn btn--ghost btn--sm" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card">
+    <div class="empty">
+      <p class="empty__title">No clients yet</p>
+      <p class="empty__text">Add your first client to start tracking time.</p>
+      <%= link_to "Add Client", new_client_path, class: "btn btn--primary" %>
+    </div>
+  </div>
+<% end %>

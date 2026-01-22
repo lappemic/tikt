@@ -1,0 +1,127 @@
+<% content_for(:title) { "#{@client.name} - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title"><%= @client.name %></h1>
+  <div class="page-header__actions">
+    <%= link_to "Edit", edit_client_path(@client), class: "btn btn--secondary" %>
+    <%= link_to "New Project", new_client_project_path(@client), class: "btn btn--primary" %>
+  </div>
+</div>
+
+<div class="stats mb-6">
+  <div class="stat">
+    <div class="stat__value"><%= number_to_currency(@client.total_billed) %></div>
+    <div class="stat__label">Total billed</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= number_with_precision(@client.total_hours, precision: 1) %></div>
+    <div class="stat__label">Hours worked</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= number_with_precision(@client.billed_hours, precision: 1) %></div>
+    <div class="stat__label">Hours billed</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= number_to_currency(@client.hourly_rate) %>/hr</div>
+    <div class="stat__label">Default rate</div>
+  </div>
+</div>
+
+<div class="card mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Projects</h2>
+  </div>
+  <% if @projects.any? %>
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th class="num">Rate</th>
+            <th class="num">Worked</th>
+            <th class="num">Billed</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @projects.each do |project| %>
+            <tr>
+              <td>
+                <%= link_to project.name, project %>
+                <% unless project.active? %>
+                  <span class="badge badge--draft">Inactive</span>
+                <% end %>
+              </td>
+              <td class="num"><%= number_to_currency(project.effective_hourly_rate) %>/hr</td>
+              <td class="num"><%= number_with_precision(project.total_hours, precision: 1) %>h</td>
+              <td class="num"><%= number_with_precision(project.billed_hours, precision: 1) %>h</td>
+              <td>
+                <%= link_to "Edit", edit_project_path(project), class: "btn btn--ghost btn--sm" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="card__body">
+      <div class="empty">
+        <p class="empty__title">No projects yet</p>
+        <%= link_to "Add Project", new_client_project_path(@client), class: "btn btn--primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<% if @uninvoiced_entries.any? %>
+  <div class="card card--flush mb-6">
+    <div class="card__header">
+      <h2 class="card__title">Uninvoiced Time</h2>
+      <%= link_to "Create Invoice", new_invoice_path(client_id: @client.id), class: "btn btn--primary btn--sm" %>
+    </div>
+    <div class="card__body">
+      <ul class="entry-list">
+        <% @uninvoiced_entries.each do |entry| %>
+          <%= render "time_entries/entry", entry: entry %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>
+
+<% if @invoices.any? %>
+  <div class="card card--flush">
+    <div class="card__header">
+      <h2 class="card__title">Recent Invoices</h2>
+      <%= link_to "View all", invoices_path, class: "btn btn--ghost btn--sm" %>
+    </div>
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th class="num">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @invoices.each do |invoice| %>
+            <tr>
+              <td><%= link_to invoice.number, invoice %></td>
+              <td><%= invoice.issued_at.strftime("%b %d, %Y") %></td>
+              <td>
+                <span class="badge badge--<%= invoice.status %>"><%= invoice.status %></span>
+              </td>
+              <td class="num"><%= number_to_currency(invoice.total) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>
+
+<p class="mt-6">
+  <%= link_to "Back to clients", clients_path %>
+</p>

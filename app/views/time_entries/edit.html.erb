@@ -1,0 +1,17 @@
+<% content_for(:title) { "Edit Time Entry - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">Edit Time Entry</h1>
+</div>
+
+<div class="card">
+  <div class="card__body">
+    <%= turbo_frame_tag @time_entry do %>
+      <%= render "form", time_entry: @time_entry %>
+    <% end %>
+  </div>
+</div>
+
+<p class="mt-4">
+  <%= link_to "Back to time entries", time_entries_path %>
+</p>

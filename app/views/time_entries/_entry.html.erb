@@ -1,0 +1,25 @@
+<%= turbo_frame_tag dom_id(entry) do %>
+  <li class="entry" id="<%= dom_id(entry) %>">
+    <div class="entry__main">
+      <div class="entry__project">
+        <%= entry.project.client.name %> / <%= entry.project.name %><% if entry.subproject.present? %> / <%= entry.subproject.name %><% end %>
+      </div>
+      <div class="entry__description">
+        <%= entry.description.presence || "No description" %>
+      </div>
+      <div class="entry__meta">
+        <%= entry.date.strftime("%b %d, %Y") %>
+        <% if entry.invoiced? %>
+          <span class="badge badge--paid">Invoiced</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="entry__hours">
+      <%= number_with_precision(entry.hours, precision: 2) %>h
+    </div>
+    <div class="entry__actions">
+      <%= link_to "Edit", edit_time_entry_path(entry), class: "btn btn--ghost btn--sm" %>
+      <%= button_to "Delete", time_entry_path(entry), method: :delete, class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Delete this entry?" } %>
+    </div>
+  </li>
+<% end %>

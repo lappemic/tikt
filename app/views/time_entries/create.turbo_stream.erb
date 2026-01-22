@@ -1,0 +1,7 @@
+<%= turbo_stream.prepend "time_entries" do %>
+  <%= render "entry", entry: @time_entry %>
+<% end %>
+
+<%= turbo_stream.replace "new_time_entry" do %>
+  <%= render "form", time_entry: TimeEntry.new(date: Date.current) %>
+<% end %>

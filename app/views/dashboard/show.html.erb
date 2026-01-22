@@ -1,0 +1,42 @@
+<% content_for(:title) { "Dashboard - Tikt" } %>
+
+<div class="page-header">
+  <h1 class="page-header__title">Today</h1>
+  <div class="page-header__actions">
+    <span class="stat__value" style="font-size: var(--text-2xl);"><%= number_with_precision(@today_hours, precision: 1) %>h</span>
+  </div>
+</div>
+
+<div class="card mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Log Time</h2>
+  </div>
+  <div class="card__body">
+    <%= turbo_frame_tag "new_time_entry" do %>
+      <%= render "time_entries/form", time_entry: TimeEntry.new(date: Date.current) %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card card--flush">
+  <div class="card__header">
+    <h2 class="card__title">Today's Entries</h2>
+    <%= link_to "View all", time_entries_path, class: "btn btn--ghost btn--sm" %>
+  </div>
+  <div class="card__body">
+    <%= turbo_frame_tag "time_entries" do %>
+      <% if @today_entries.any? %>
+        <ul class="entry-list">
+          <% @today_entries.each do |entry| %>
+            <%= render "time_entries/entry", entry: entry %>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="empty">
+          <p class="empty__title">No entries today</p>
+          <p class="empty__text">Start tracking your time using the form above.</p>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
