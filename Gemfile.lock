@@ -413,6 +413,7 @@ DEPENDENCIES
   jbuilder
   kamal
   letter_opener
+  matrix
   prawn
   prawn-table
   propshaft

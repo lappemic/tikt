@@ -1,5 +1,5 @@
 #!/bin/bash
-# Server setup script for TikT deployment
+# Server setup script for TikT deployment (native, no Docker)
 # Run this on the Hetzner VPS: ssh scraperuser@49.13.27.61
 
 set -e
@@ -10,26 +10,44 @@ echo "=== TikT Server Setup ==="
 echo "Updating system packages..."
 sudo apt update && sudo apt upgrade -y
 
-# Check if Docker is installed
-if command -v docker &> /dev/null; then
-    echo "Docker already installed: $(docker --version)"
-else
-    echo "Installing Docker..."
-    sudo apt install -y apt-transport-https ca-certificates curl
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt update
-    sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+# Install build dependencies for Ruby
+echo "Installing build dependencies..."
+sudo apt install -y build-essential libssl-dev libreadline-dev zlib1g-dev \
+  libyaml-dev libffi-dev libsqlite3-dev libvips-dev
 
-    # Add user to docker group
-    sudo usermod -aG docker $USER
-    echo "Docker installed. You'll need to logout and back in for group changes."
+# Install rbenv + ruby-build
+if [ -d "$HOME/.rbenv" ]; then
+    echo "rbenv already installed"
+else
+    echo "Installing rbenv..."
+    git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+    git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+
+    # Add to bashrc if not already there
+    if ! grep -q 'rbenv/bin' ~/.bashrc; then
+        echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+        echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+    fi
 fi
 
-# Create storage directory
-echo "Creating storage directory..."
-sudo mkdir -p /opt/tikt/storage
-sudo chown $USER:$USER /opt/tikt
+# Ensure rbenv is in PATH for this script
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+
+# Install Ruby 3.4.7
+RUBY_VERSION="3.4.7"
+if rbenv versions --bare | grep -q "^${RUBY_VERSION}$"; then
+    echo "Ruby $RUBY_VERSION already installed"
+else
+    echo "Installing Ruby $RUBY_VERSION (this takes a few minutes)..."
+    rbenv install $RUBY_VERSION
+fi
+rbenv global $RUBY_VERSION
+
+echo "Ruby $(ruby --version)"
+
+# Install bundler
+gem install bundler
 
 # Check if Nginx is installed
 if command -v nginx &> /dev/null; then
@@ -47,14 +65,20 @@ else
     sudo apt install -y certbot python3-certbot-nginx
 fi
 
+# Create storage directory
+echo "Setting up storage directory..."
+mkdir -p ~/projects/tikt/storage
+
 echo ""
 echo "=== Setup Complete ==="
-echo "Docker: $(docker --version 2>/dev/null || echo 'Need to logout/login')"
+echo "Ruby: $(ruby --version)"
+echo "Bundler: $(bundle --version)"
 echo "Nginx: $(nginx -v 2>&1)"
 echo "Certbot: $(certbot --version 2>&1)"
-echo "Storage: /opt/tikt/storage"
 echo ""
-echo "IMPORTANT: If Docker was just installed, logout and login again:"
-echo "  exit"
-echo "  ssh scraperuser@49.13.27.61"
-echo "  docker run hello-world"
+echo "Next steps:"
+echo "  1. cd ~/projects/tikt && bundle install --without development test"
+echo "  2. Copy config/master.key from local machine"
+echo "  3. Run scripts/ssl-setup.sh your-email@example.com"
+echo "  4. sudo cp scripts/tikt.service /etc/systemd/system/"
+echo "  5. sudo systemctl enable --now tikt"
