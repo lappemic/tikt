@@ -21,7 +21,8 @@ echo "Pulling latest code..."
 git pull origin main
 
 echo "Installing dependencies..."
-bundle install --without development test
+bundle config set --local without 'development test'
+bundle install
 
 echo "Running migrations..."
 RAILS_ENV=production bin/rails db:migrate
