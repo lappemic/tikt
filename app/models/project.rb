@@ -16,6 +16,7 @@ class Project < ApplicationRecord
   def accepted? = status == "accepted"
   def rejected? = status == "rejected"
   def finished? = status == "finished"
+  def active? = accepted?
   def can_log_time? = accepted?
 
   def effective_hourly_rate
