@@ -1,4 +1,4 @@
-<%= form_with model: [project.client, project] do |f| %>
+<%= form_with model: project.persisted? ? project : [project.client, project] do |f| %>
   <% if project.errors.any? %>
     <div class="flash flash--alert mb-4">
       <strong><%= pluralize(project.errors.count, "error") %> prevented this project from being saved:</strong>
