@@ -1,24 +1,48 @@
-# README
+# TikT
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Time tracking and invoicing app for freelancers and small teams. Track time entries across clients, projects, and subprojects, then generate PDF invoices.
 
-Things you may want to cover:
+## Features
 
-* Ruby version
+- **Clients** — manage client contacts and details
+- **Projects & Subprojects** — organize work with budgets and status tracking
+- **Time Entries** — log hours against projects/subprojects
+- **Invoices** — generate and send invoices with line items, export as PDF
+- **Dashboard** — overview of current work
 
-* System dependencies
+## Tech Stack
 
-* Configuration
+- Ruby 3.4 / Rails 8.1
+- SQLite (all environments)
+- Hotwire (Turbo + Stimulus)
+- Propshaft asset pipeline
+- Puma web server
+- Prawn for PDF generation
 
-* Database creation
+## Setup
 
-* Database initialization
+```bash
+git clone git@github.com:lappemic/tikt.git
+cd tikt
+bundle install
+bin/rails db:setup
+bin/dev
+```
 
-* How to run the test suite
+The app runs at `http://localhost:3000`.
 
-* Services (job queues, cache servers, search engines, etc.)
+## Testing
 
-* Deployment instructions
+```bash
+bin/rails test
+```
 
-* ...
+## Deployment
+
+Deployed on a Hetzner VPS with Nginx reverse-proxying to Puma. The site is password-protected via HTTP Basic Auth.
+
+```bash
+./scripts/deploy.sh
+```
+
+This SSHes into the VPS, pulls latest `main`, installs deps, runs migrations, precompiles assets, and restarts Puma.
