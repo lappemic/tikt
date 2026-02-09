@@ -18,5 +18,19 @@ Rails.application.routes.draw do
     end
   end
 
+  # Portal login/logout
+  scope :portal do
+    get "login", to: "portal/sessions#new", as: :portal_login
+    post "login", to: "portal/sessions#create"
+    delete "logout", to: "portal/sessions#destroy", as: :portal_logout
+  end
+
+  namespace :portal do
+    root "dashboard#show"
+    resources :projects, only: [ :index, :show ]
+    resources :invoices, only: [ :index, :show ]
+    resources :time_entries, only: [ :index ]
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

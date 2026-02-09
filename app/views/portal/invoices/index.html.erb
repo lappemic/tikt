@@ -1,0 +1,39 @@
+<% content_for(:title) { "Invoices - Tikt" } %>
+
+<h1 class="mb-6">Invoices</h1>
+
+<% if @invoices.any? %>
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Issue Date</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th class="num">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invoices.each do |invoice| %>
+          <tr>
+            <td><%= link_to invoice.number, portal_invoice_path(invoice) %></td>
+            <td><%= invoice.issued_at.strftime("%b %d, %Y") %></td>
+            <td><%= invoice.due_at.strftime("%b %d, %Y") %></td>
+            <td>
+              <span class="badge badge--<%= invoice.status %>"><%= invoice.status.upcase %></span>
+              <% if invoice.overdue? %>
+                <span class="badge badge--overdue">OVERDUE</span>
+              <% end %>
+            </td>
+            <td class="num"><%= number_to_currency(invoice.total) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty">
+    <p class="empty__title">No invoices yet</p>
+  </div>
+<% end %>

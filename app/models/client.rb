@@ -1,11 +1,14 @@
 class Client < ApplicationRecord
+  has_secure_password validations: false
+
   has_many :projects, dependent: :destroy
   has_many :invoices, dependent: :destroy
   has_many :time_entries, through: :projects
 
   validates :name, presence: true
-  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, uniqueness: true
   validates :hourly_rate, numericality: { greater_than_or_equal_to: 0 }
+  validates :password, length: { minimum: 8 }, allow_blank: true
 
   scope :with_uninvoiced_time, -> {
     joins(:time_entries).where(time_entries: { invoiced: false }).distinct
@@ -29,5 +32,9 @@ class Client < ApplicationRecord
 
   def billed_hours
     time_entries.invoiced.sum(:hours)
+  end
+
+  def portal_access?
+    portal_enabled? && password_digest.present?
   end
 end

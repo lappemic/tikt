@@ -1,0 +1,54 @@
+<% content_for(:title) { "Time Log - Tikt" } %>
+
+<h1 class="mb-6">Time Log</h1>
+
+<%= form_with url: portal_time_entries_path, method: :get, class: "form-inline mb-6" do |f| %>
+  <div class="form-group">
+    <%= f.label :start_date, "From", class: "form-label" %>
+    <%= f.date_field :start_date, value: params[:start_date], class: "form-input" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :end_date, "To", class: "form-label" %>
+    <%= f.date_field :end_date, value: params[:end_date], class: "form-input" %>
+  </div>
+  <%= f.submit "Filter", class: "btn btn--secondary" %>
+<% end %>
+
+<% if @time_entries.any? %>
+  <div class="card card--flush">
+    <div class="card__body" style="padding: 0;">
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Project</th>
+              <th>Subproject</th>
+              <th>Description</th>
+              <th class="num">Hours</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @time_entries.each do |entry| %>
+              <tr>
+                <td><%= entry.date.strftime("%b %d, %Y") %></td>
+                <td><%= link_to entry.project.name, portal_project_path(entry.project) %></td>
+                <td><%= entry.subproject&.name || "—" %></td>
+                <td><%= entry.description %></td>
+                <td class="num"><%= number_with_precision(entry.hours, precision: 2) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card__footer">
+      <strong>Total: <%= number_with_precision(@time_entries.sum(:hours), precision: 1) %> hours</strong>
+    </div>
+  </div>
+<% else %>
+  <div class="empty">
+    <p class="empty__title">No time entries found</p>
+    <p class="empty__text">Try adjusting the date range.</p>
+  </div>
+<% end %>

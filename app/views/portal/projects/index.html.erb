@@ -1,0 +1,35 @@
+<% content_for(:title) { "Projects - Tikt" } %>
+
+<h1 class="mb-6">Projects</h1>
+
+<% if @projects.any? %>
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Status</th>
+          <th class="num">Total Hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @projects.each do |project| %>
+          <tr>
+            <td>
+              <%= link_to project.name, portal_project_path(project) %>
+              <% if project.subprojects.any? %>
+                <span class="text-muted text-sm">(<%= project.subprojects.count %> subprojects)</span>
+              <% end %>
+            </td>
+            <td><span class="badge badge--<%= project.status == 'accepted' ? 'paid' : 'draft' %>"><%= project.status.upcase %></span></td>
+            <td class="num"><%= number_with_precision(project.total_hours, precision: 1) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty">
+    <p class="empty__title">No projects yet</p>
+  </div>
+<% end %>

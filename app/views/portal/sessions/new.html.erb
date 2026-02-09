@@ -1,0 +1,23 @@
+<% content_for(:title) { "Log in - Tikt" } %>
+
+<div class="portal-login">
+  <div class="portal-login__card card">
+    <div class="card__body">
+      <h1 class="mb-6" style="text-align: center;">Client Portal</h1>
+
+      <%= form_with url: portal_login_path, method: :post do |f| %>
+        <div class="form-group">
+          <%= f.label :email, class: "form-label" %>
+          <%= f.email_field :email, class: "form-input", autofocus: true, autocomplete: "email", required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :password, class: "form-label" %>
+          <%= f.password_field :password, class: "form-input", autocomplete: "current-password", required: true %>
+        </div>
+
+        <%= f.submit "Log in", class: "btn btn--primary btn--block" %>
+      <% end %>
+    </div>
+  </div>
+</div>

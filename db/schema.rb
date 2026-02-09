@@ -10,15 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_03_055025) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_09_141123) do
   create_table "clients", force: :cascade do |t|
     t.text "address"
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.decimal "hourly_rate", precision: 10, scale: 2, default: "0.0"
     t.string "name", null: false
+    t.string "password_digest"
     t.string "phone"
+    t.boolean "portal_enabled", default: false, null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_clients_on_email", unique: true
   end
 
   create_table "invoice_line_items", force: :cascade do |t|

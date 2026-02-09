@@ -1,0 +1,102 @@
+<% content_for(:title) { "Dashboard - Tikt" } %>
+
+<h1 class="mb-6">Welcome, <%= current_client.name %></h1>
+
+<div class="stats mb-8">
+  <div class="stat">
+    <div class="stat__value"><%= number_with_precision(@total_hours, precision: 1) %></div>
+    <div class="stat__label">Total Hours</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= @projects.count %></div>
+    <div class="stat__label">Projects</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= @recent_invoices.count { |i| i.sent? || i.overdue? } %></div>
+    <div class="stat__label">Open Invoices</div>
+  </div>
+</div>
+
+<div class="card card--flush mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Recent Time Entries</h2>
+    <%= link_to "View all", portal_time_entries_path, class: "btn btn--ghost btn--sm" %>
+  </div>
+  <% if @recent_entries.any? %>
+    <div class="card__body" style="padding: 0;">
+      <div class="table-wrapper">
+        <table class="table table--compact">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Project</th>
+              <th>Description</th>
+              <th class="num">Hours</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_entries.each do |entry| %>
+              <tr>
+                <td><%= entry.date.strftime("%b %d") %></td>
+                <td>
+                  <%= link_to entry.project.name, portal_project_path(entry.project) %>
+                  <% if entry.subproject %>
+                    <span class="text-muted">/ <%= entry.subproject.name %></span>
+                  <% end %>
+                </td>
+                <td><%= entry.description %></td>
+                <td class="num"><%= number_with_precision(entry.hours, precision: 2) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="card__body">
+      <p class="text-muted">No time entries yet.</p>
+    </div>
+  <% end %>
+</div>
+
+<div class="card card--flush">
+  <div class="card__header">
+    <h2 class="card__title">Recent Invoices</h2>
+    <%= link_to "View all", portal_invoices_path, class: "btn btn--ghost btn--sm" %>
+  </div>
+  <% if @recent_invoices.any? %>
+    <div class="card__body" style="padding: 0;">
+      <div class="table-wrapper">
+        <table class="table table--compact">
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th class="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_invoices.each do |invoice| %>
+              <tr>
+                <td><%= link_to invoice.number, portal_invoice_path(invoice) %></td>
+                <td><%= invoice.issued_at.strftime("%b %d, %Y") %></td>
+                <td>
+                  <span class="badge badge--<%= invoice.status %>"><%= invoice.status.upcase %></span>
+                  <% if invoice.overdue? %>
+                    <span class="badge badge--overdue">OVERDUE</span>
+                  <% end %>
+                </td>
+                <td class="num"><%= number_to_currency(invoice.total) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="card__body">
+      <p class="text-muted">No invoices yet.</p>
+    </div>
+  <% end %>
+</div>

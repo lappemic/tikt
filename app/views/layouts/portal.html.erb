@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "Client Portal - Tikt" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <div class="app">
+      <nav class="nav portal-nav">
+        <div class="container nav__inner">
+          <%= link_to "Tikt", portal_root_path, class: "nav__brand" %>
+          <% if current_client %>
+            <ul class="nav__links">
+              <li>
+                <%= link_to "Dashboard", portal_root_path, class: "nav__link #{controller_name == 'dashboard' ? 'nav__link--active' : ''}" %>
+              </li>
+              <li>
+                <%= link_to "Projects", portal_projects_path, class: "nav__link #{controller_name == 'projects' ? 'nav__link--active' : ''}" %>
+              </li>
+              <li>
+                <%= link_to "Invoices", portal_invoices_path, class: "nav__link #{controller_name == 'invoices' ? 'nav__link--active' : ''}" %>
+              </li>
+              <li>
+                <%= link_to "Time Log", portal_time_entries_path, class: "nav__link #{controller_name == 'time_entries' ? 'nav__link--active' : ''}" %>
+              </li>
+              <li>
+                <%= button_to "Log out", portal_logout_path, method: :delete, class: "nav__link", style: "border: none; background: none; cursor: pointer;" %>
+              </li>
+            </ul>
+          <% end %>
+        </div>
+      </nav>
+
+      <main class="app__main">
+        <div class="container">
+          <% if flash[:notice] %>
+            <div class="flash flash--notice"><%= flash[:notice] %></div>
+          <% end %>
+          <% if flash[:alert] %>
+            <div class="flash flash--alert"><%= flash[:alert] %></div>
+          <% end %>
+
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

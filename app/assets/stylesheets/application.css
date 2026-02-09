@@ -890,3 +890,26 @@ a:hover {
     gap: var(--space-4);
   }
 }
+
+/* --------------------------------------------------------------------------
+   Portal
+   -------------------------------------------------------------------------- */
+.portal-nav {
+  background: #2c5282;
+}
+
+.portal-nav .nav__brand:hover {
+  color: #bee3f8;
+}
+
+.portal-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.portal-login__card {
+  width: 100%;
+  max-width: 400px;
+}
