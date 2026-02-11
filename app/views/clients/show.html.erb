@@ -14,6 +14,10 @@
     <div class="stat__label">Total billed</div>
   </div>
   <div class="stat">
+    <div class="stat__value"><%= number_to_currency(@client.total_worked) %></div>
+    <div class="stat__label">Total worked</div>
+  </div>
+  <div class="stat">
     <div class="stat__value"><%= number_with_precision(@client.total_hours, precision: 1) %></div>
     <div class="stat__label">Hours worked</div>
   </div>

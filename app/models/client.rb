@@ -34,6 +34,10 @@ class Client < ApplicationRecord
     time_entries.invoiced.sum(:hours)
   end
 
+  def total_worked
+    time_entries.sum { |entry| entry.amount_cents } / 100.0
+  end
+
   def portal_access?
     portal_enabled? && password_digest.present?
   end

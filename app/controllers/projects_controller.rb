@@ -3,7 +3,7 @@ class ProjectsController < ApplicationController
   before_action :set_project, only: %i[show edit update destroy]
 
   def index
-    @projects = Project.includes(:client).order("clients.name, projects.name")
+    @projects = Project.includes(:client, :time_entries).order("clients.name, projects.name")
   end
 
   def show
