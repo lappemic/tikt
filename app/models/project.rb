@@ -36,7 +36,7 @@ class Project < ApplicationRecord
   end
 
   def total_cost_cents
-    time_entries.sum { |entry| entry.amount_cents }
+    time_entries.sum(&:amount_cents)
   end
 
   def total_cost

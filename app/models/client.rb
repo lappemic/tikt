@@ -35,7 +35,7 @@ class Client < ApplicationRecord
   end
 
   def total_worked
-    time_entries.sum { |entry| entry.amount_cents } / 100.0
+    time_entries.sum(&:amount_cents) / 100.0
   end
 
   def portal_access?

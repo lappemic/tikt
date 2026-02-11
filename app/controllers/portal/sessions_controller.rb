@@ -1,5 +1,7 @@
 module Portal
   class SessionsController < ApplicationController
+    include PortalAuthentication
+
     layout "portal"
     rate_limit to: 10, within: 1.minute, only: :create
 
@@ -23,12 +25,5 @@ module Portal
       session.delete(:client_id)
       redirect_to portal_login_path, notice: "Logged out."
     end
-
-    private
-
-    def current_client
-      @current_client ||= Client.find_by(id: session[:client_id], portal_enabled: true)
-    end
-    helper_method :current_client
   end
 end

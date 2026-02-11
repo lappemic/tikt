@@ -4,7 +4,7 @@
   <div>
     <h1 class="page-header__title"><%= @project.name %></h1>
     <p class="text-muted">
-      <span class="badge badge--<%= @project.status == 'accepted' ? 'paid' : 'draft' %>"><%= @project.status.upcase %></span>
+      <%= project_status_badge(@project) %>
     </p>
   </div>
 </div>
@@ -41,7 +41,7 @@
             <% @subprojects.each do |sub| %>
               <tr>
                 <td><%= sub.name %></td>
-                <td><span class="badge badge--<%= sub.status == 'accepted' ? 'paid' : 'draft' %>"><%= sub.status.upcase %></span></td>
+                <td><%= project_status_badge(sub) %></td>
                 <td class="num"><%= number_with_precision(sub.total_hours, precision: 1) %></td>
               </tr>
             <% end %>

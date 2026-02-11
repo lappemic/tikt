@@ -21,7 +21,7 @@
                 <span class="text-muted text-sm">(<%= project.subprojects.count %> subprojects)</span>
               <% end %>
             </td>
-            <td><span class="badge badge--<%= project.status == 'accepted' ? 'paid' : 'draft' %>"><%= project.status.upcase %></span></td>
+            <td><%= project_status_badge(project) %></td>
             <td class="num"><%= number_with_precision(project.total_hours, precision: 1) %></td>
           </tr>
         <% end %>
