@@ -22,5 +22,20 @@ Rails app for time tracking, deployed on Hetzner VPS.
 - htpasswd file: `/etc/nginx/.htpasswd`
 - Avoid special characters (`!`, `@`, `$`) in passwords — browsers mangle them in HTTP Basic Auth encoding
 
+## Running Rails on VPS
+- Ruby is managed via **rbenv** (`~/.rbenv/`) — not in default PATH
+- Must init rbenv before running Rails commands:
+  ```bash
+  ssh hetzner-scraper 'export PATH="$HOME/.rbenv/bin:$PATH" && eval "$(rbenv init -)" && cd ~/projects/tikt && RAILS_ENV=production bin/rails runner "..."'
+  ```
+- For multi-line scripts: write `.rb` file locally, `scp` to VPS, then `bin/rails runner /tmp/script.rb` — avoids shell escaping issues (especially `!` in `create!`)
+- App lives at `~/projects/tikt` on the VPS
+
+## Production Data
+- Insert time entries via `TimeEntry.create!(project: project, date:, hours:, description:)`
+- Query clients/projects: `Client.all` → `client.projects`
+- Query entries: `TimeEntry.joins(:project).where(projects: { client_id: ID }).order(:date)`
+
 ## Gotchas
 - Nginx site filename is `tikt.bytebricks.ch`, not `tikt` — the symlink expects this exact name
+- Shell escaping: `!` in Ruby bang methods (`create!`) gets mangled by bash heredocs and SSH quoting — always use SCP'd script files for production runners
