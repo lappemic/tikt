@@ -43,6 +43,7 @@
             <th>Name</th>
             <th class="num">Rate</th>
             <th class="num">Worked</th>
+            <th class="num">Total</th>
             <th class="num">Billed</th>
             <th></th>
           </tr>
@@ -58,6 +59,7 @@
               </td>
               <td class="num"><%= number_to_currency(project.effective_hourly_rate) %>/hr</td>
               <td class="num"><%= number_with_precision(project.total_hours, precision: 1) %>h</td>
+              <td class="num"><%= number_to_currency(project.total_cost) %></td>
               <td class="num"><%= number_with_precision(project.billed_hours, precision: 1) %>h</td>
               <td>
                 <%= link_to "Edit", edit_project_path(project), class: "btn btn--ghost btn--sm" %>
