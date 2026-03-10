@@ -4,6 +4,10 @@ class ProjectsController < ApplicationController
 
   def index
     @projects = Project.includes(:client, :time_entries).order("clients.name, projects.name")
+    @projects = @projects.by_status(params[:status]) if params[:status].present? && Project::STATUSES.include?(params[:status])
+
+    @counts = Project::STATUSES.index_with { |s| Project.where(status: s).count }
+    @counts["all"] = Project.count
   end
 
   def show

@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   end
 
   resources :time_entries
-  resources :projects, only: [] do
+  resources :projects, only: [:index] do
     get :subprojects, on: :member
   end
   resources :invoices do

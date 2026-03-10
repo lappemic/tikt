@@ -1,7 +1,41 @@
-<% content_for(:title) { "Projects - Tikt" } %>
+<% content_for(:title) { "Projects Overview - Tikt" } %>
 
 <div class="page-header">
-  <h1 class="page-header__title">Projects</h1>
+  <h1 class="page-header__title">Projects Overview</h1>
+</div>
+
+<%
+  total_budget = @projects.sum { |p| p.budget_cents || 0 } / 100.0
+  total_used = @projects.sum(&:total_cost_cents) / 100.0
+  total_remaining = total_budget - total_used
+%>
+
+<div class="stats mb-6">
+  <div class="stat">
+    <div class="stat__value"><%= @projects.size %></div>
+    <div class="stat__label">Projects</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= number_to_currency(total_budget) %></div>
+    <div class="stat__label">Total budget</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= number_to_currency(total_used) %></div>
+    <div class="stat__label">Used</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value <%= total_remaining < 0 ? 'text-danger' : '' %>"><%= number_to_currency(total_remaining) %></div>
+    <div class="stat__label">Remaining</div>
+  </div>
+</div>
+
+<div class="filter-bar mb-4">
+  <%= link_to "All (#{@counts['all']})", projects_path,
+    class: "filter-pill #{params[:status].blank? ? 'filter-pill--active' : ''}" %>
+  <% Project::STATUSES.each do |s| %>
+    <%= link_to "#{s.titleize} (#{@counts[s]})", projects_path(status: s),
+      class: "filter-pill #{params[:status] == s ? 'filter-pill--active' : ''}" %>
+  <% end %>
 </div>
 
 <% if @projects.any? %>
@@ -12,10 +46,11 @@
           <tr>
             <th>Client</th>
             <th>Project</th>
-            <th class="num">Rate</th>
-            <th class="num">Worked</th>
-            <th class="num">Total</th>
             <th>Status</th>
+            <th class="num">Budget</th>
+            <th class="num">Used</th>
+            <th class="num">Remaining</th>
+            <th style="min-width: 100px">Progress</th>
             <th></th>
           </tr>
         </thead>
@@ -23,32 +58,67 @@
           <% @projects.each do |project| %>
             <tr>
               <td><%= link_to project.client.name, project.client %></td>
-              <td><%= project.name %></td>
-              <td class="num"><%= number_to_currency(project.effective_hourly_rate) %>/hr</td>
-              <td class="num"><%= number_with_precision(project.total_hours, precision: 1) %>h</td>
-              <td class="num"><%= number_to_currency(project.total_cost) %></td>
-              <td>
-                <% if project.active? %>
-                  <span class="badge badge--paid">Active</span>
+              <td><%= link_to project.name, project %></td>
+              <td><%= render "shared/status_badge", status: project.status %></td>
+              <td class="num">
+                <% if project.budget.present? %>
+                  <%= number_to_currency(project.budget) %>
                 <% else %>
-                  <span class="badge badge--draft">Inactive</span>
+                  <span class="text-muted">&mdash;</span>
+                <% end %>
+              </td>
+              <td class="num"><%= number_to_currency(project.total_cost) %></td>
+              <td class="num">
+                <% if project.budget_remaining.present? %>
+                  <span class="<%= project.budget_remaining < 0 ? 'text-danger' : '' %>">
+                    <%= number_to_currency(project.budget_remaining) %>
+                  </span>
+                <% else %>
+                  <span class="text-muted">&mdash;</span>
                 <% end %>
               </td>
               <td>
-                <%= link_to "Edit", edit_project_path(project), class: "btn btn--ghost btn--sm" %>
+                <% if project.budget_percentage_used.present? %>
+                  <div class="progress-bar">
+                    <% pct = [project.budget_percentage_used, 100].min %>
+                    <div class="progress-bar__fill <%= project.budget_percentage_used > 100 ? 'progress-bar__fill--danger' : '' %>" style="width: <%= pct %>%"></div>
+                  </div>
+                  <span class="text-xs text-muted"><%= project.budget_percentage_used %>%</span>
+                <% end %>
+              </td>
+              <td>
+                <%= link_to "View", project_path(project), class: "btn btn--ghost btn--sm" %>
               </td>
             </tr>
           <% end %>
         </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><strong>Totals</strong></td>
+            <td class="num"><strong><%= number_to_currency(total_budget) %></strong></td>
+            <td class="num"><strong><%= number_to_currency(total_used) %></strong></td>
+            <td class="num">
+              <strong class="<%= total_remaining < 0 ? 'text-danger' : '' %>">
+                <%= number_to_currency(total_remaining) %>
+              </strong>
+            </td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   </div>
 <% else %>
   <div class="card">
     <div class="empty">
-      <p class="empty__title">No projects yet</p>
-      <p class="empty__text">Create a client first, then add projects to it.</p>
-      <%= link_to "Add Client", new_client_path, class: "btn btn--primary" %>
+      <p class="empty__title">No projects found</p>
+      <% if params[:status].present? %>
+        <p class="empty__text">No projects with status "<%= params[:status].titleize %>".</p>
+        <%= link_to "Show all projects", projects_path, class: "btn btn--primary" %>
+      <% else %>
+        <p class="empty__text">Create a client first, then add projects to it.</p>
+        <%= link_to "Add Client", new_client_path, class: "btn btn--primary" %>
+      <% end %>
     </div>
   </div>
 <% end %>
