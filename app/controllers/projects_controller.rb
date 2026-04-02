@@ -3,7 +3,7 @@ class ProjectsController < ApplicationController
   before_action :set_project, only: %i[show edit update destroy]
 
   def index
-    @projects = Project.includes(:client, :time_entries).order("clients.name, projects.name")
+    @projects = Project.includes(:client, :time_entries, :billings).order("clients.name, projects.name")
     @projects = @projects.by_status(params[:status]) if params[:status].present? && Project::STATUSES.include?(params[:status])
 
     @counts = Project::STATUSES.index_with { |s| Project.where(status: s).count }
@@ -13,6 +13,7 @@ class ProjectsController < ApplicationController
   def show
     @subprojects = @project.subprojects.order(:name)
     @time_entries = @project.time_entries.recent.limit(20)
+    @billings = @project.billings.recent.limit(20)
   end
 
   def new

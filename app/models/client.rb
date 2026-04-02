@@ -4,6 +4,7 @@ class Client < ApplicationRecord
   has_many :projects, dependent: :destroy
   has_many :invoices, dependent: :destroy
   has_many :time_entries, through: :projects
+  has_many :billings, through: :projects
 
   validates :name, presence: true
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, uniqueness: true
@@ -31,7 +32,7 @@ class Client < ApplicationRecord
   end
 
   def billed_hours
-    time_entries.invoiced.sum(:hours)
+    billings.sum(:hours)
   end
 
   def total_worked

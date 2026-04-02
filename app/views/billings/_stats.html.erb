@@ -1,0 +1,21 @@
+<div id="billing_stats" class="stats mb-6">
+  <div class="stat">
+    <div class="stat__value"><%= number_with_precision(project.total_hours, precision: 1) %></div>
+    <div class="stat__label">Hours worked</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= number_with_precision(project.billed_hours, precision: 1) %></div>
+    <div class="stat__label">Hours billed</div>
+  </div>
+  <div class="stat">
+    <% delta = project.billed_hours - project.total_hours %>
+    <div class="stat__value <%= delta < 0 ? 'text-danger' : '' %>">
+      <%= delta >= 0 ? "+" : "" %><%= number_with_precision(delta, precision: 1) %>
+    </div>
+    <div class="stat__label">Delta</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= number_to_currency(project.total_billed) %></div>
+    <div class="stat__label">Total billed</div>
+  </div>
+</div>
