@@ -1,6 +1,6 @@
 class BillingsController < ApplicationController
+  before_action :set_project, only: [:create]
   before_action :set_billing, only: [:destroy]
-  before_action :set_project
 
   def create
     @billing = @project.billings.build(billing_params)
@@ -34,11 +34,7 @@ class BillingsController < ApplicationController
   private
 
   def set_project
-    @project = if params[:project_id]
-      Project.find(params[:project_id])
-    else
-      @billing.project
-    end
+    @project = Project.find(params[:project_id])
   end
 
   def set_billing

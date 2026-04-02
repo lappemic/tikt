@@ -57,7 +57,7 @@ class Project < ApplicationRecord
   end
 
   def budget=(value)
-    self.budget_cents = value.present? ? (value.to_f * 100).to_i : nil
+    self.budget_cents = value.present? ? (value.to_f * 100).round : nil
   end
 
   def budget_remaining_cents

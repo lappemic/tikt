@@ -13,6 +13,6 @@ class Billing < ApplicationRecord
   end
 
   def amount=(value)
-    self.amount_cents = value.present? ? (value.to_f * 100).to_i : nil
+    self.amount_cents = value.present? ? (value.to_f * 100).round : nil
   end
 end
