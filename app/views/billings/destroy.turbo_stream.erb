@@ -1,0 +1,5 @@
+<%= turbo_stream.remove @billing %>
+
+<%= turbo_stream.replace "billing_stats" do %>
+  <%= render "billings/stats", project: @project %>
+<% end %>

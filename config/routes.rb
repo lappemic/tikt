@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :clients do
     resources :projects, shallow: true do
       resources :subprojects, shallow: true
+      resources :billings, only: [:create, :destroy], shallow: true
     end
   end
 

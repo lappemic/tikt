@@ -1,0 +1,11 @@
+<%= turbo_stream.prepend "billings" do %>
+  <%= render "billings/billing", billing: @billing %>
+<% end %>
+
+<%= turbo_stream.replace "new_billing" do %>
+  <%= render "billings/form", project: @project, billing: Billing.new(date: Date.current) %>
+<% end %>
+
+<%= turbo_stream.replace "billing_stats" do %>
+  <%= render "billings/stats", project: @project %>
+<% end %>

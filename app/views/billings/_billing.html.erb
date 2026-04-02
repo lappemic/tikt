@@ -1,0 +1,20 @@
+<li class="entry" id="<%= dom_id(billing) %>">
+  <div class="entry__main">
+    <div class="entry__description">
+      <%= billing.note.presence || "Billing record" %>
+    </div>
+    <div class="entry__meta">
+      <%= billing.date.strftime("%b %d, %Y") %> &middot;
+      <%= number_to_currency(billing.amount) %>
+    </div>
+  </div>
+  <div class="entry__hours">
+    <%= number_with_precision(billing.hours, precision: 2) %>h
+  </div>
+  <div class="entry__actions">
+    <%= button_to billing_path(billing), method: :delete, class: "btn btn--ghost btn--sm",
+        data: { turbo_confirm: "Delete this billing record?" } do %>
+      Delete
+    <% end %>
+  </div>
+</li>

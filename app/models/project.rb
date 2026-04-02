@@ -3,6 +3,7 @@ class Project < ApplicationRecord
 
   belongs_to :client
   has_many :time_entries, dependent: :destroy
+  has_many :billings, dependent: :destroy
   has_many :subprojects, dependent: :destroy
 
   validates :name, presence: true
@@ -32,7 +33,15 @@ class Project < ApplicationRecord
   end
 
   def billed_hours
-    time_entries.invoiced.sum(:hours)
+    billings.sum(:hours)
+  end
+
+  def total_billed_cents
+    billings.sum(:amount_cents)
+  end
+
+  def total_billed
+    total_billed_cents / 100.0
   end
 
   def total_cost_cents

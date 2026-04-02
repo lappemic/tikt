@@ -8,6 +8,7 @@
   total_budget = @projects.sum { |p| p.budget_cents || 0 } / 100.0
   total_used = @projects.sum(&:total_cost_cents) / 100.0
   total_remaining = total_budget - total_used
+  total_billed = @projects.sum(&:total_billed_cents) / 100.0
 %>
 
 <div class="stats mb-6">
@@ -26,6 +27,10 @@
   <div class="stat">
     <div class="stat__value <%= total_remaining < 0 ? 'text-danger' : '' %>"><%= number_to_currency(total_remaining) %></div>
     <div class="stat__label">Remaining</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= number_to_currency(total_billed) %></div>
+    <div class="stat__label">Total billed</div>
   </div>
 </div>
 
@@ -49,6 +54,7 @@
             <th>Status</th>
             <th class="num">Budget</th>
             <th class="num">Used</th>
+            <th class="num">Billed</th>
             <th class="num">Remaining</th>
             <th style="min-width: 100px">Progress</th>
             <th></th>
@@ -68,6 +74,7 @@
                 <% end %>
               </td>
               <td class="num"><%= number_to_currency(project.total_cost) %></td>
+              <td class="num"><%= number_to_currency(project.total_billed) %></td>
               <td class="num">
                 <% if project.budget_remaining.present? %>
                   <span class="<%= project.budget_remaining < 0 ? 'text-danger' : '' %>">
@@ -97,6 +104,7 @@
             <td colspan="3"><strong>Totals</strong></td>
             <td class="num"><strong><%= number_to_currency(total_budget) %></strong></td>
             <td class="num"><strong><%= number_to_currency(total_used) %></strong></td>
+            <td class="num"><strong><%= number_to_currency(total_billed) %></strong></td>
             <td class="num">
               <strong class="<%= total_remaining < 0 ? 'text-danger' : '' %>">
                 <%= number_to_currency(total_remaining) %>

@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_09_141123) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_02_100309) do
+  create_table "billings", force: :cascade do |t|
+    t.integer "amount_cents", null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.decimal "hours", precision: 5, scale: 2, null: false
+    t.text "note"
+    t.integer "project_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_billings_on_date"
+    t.index ["project_id"], name: "index_billings_on_project_id"
+  end
+
   create_table "clients", force: :cascade do |t|
     t.text "address"
     t.datetime "created_at", null: false
@@ -91,6 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_141123) do
     t.index ["subproject_id"], name: "index_time_entries_on_subproject_id"
   end
 
+  add_foreign_key "billings", "projects"
   add_foreign_key "invoice_line_items", "invoices"
   add_foreign_key "invoice_line_items", "time_entries"
   add_foreign_key "invoices", "clients"
