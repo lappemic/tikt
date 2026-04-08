@@ -9,7 +9,7 @@ class Billing < ApplicationRecord
   scope :for_date_range, ->(start_date, end_date) { where(date: start_date..end_date) }
 
   def amount
-    amount_cents / 100.0
+    amount_cents.present? ? amount_cents / 100.0 : nil
   end
 
   def amount=(value)
