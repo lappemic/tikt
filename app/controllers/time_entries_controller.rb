@@ -2,8 +2,18 @@ class TimeEntriesController < ApplicationController
   before_action :set_time_entry, only: %i[show edit update destroy]
 
   def index
-    @time_entries = TimeEntry.includes(project: :client).recent
-    @projects = Project.active.includes(:client).order(:name)
+    @time_entries = filtered_time_entries
+    @projects = Project.active.includes(:client).order("clients.name, projects.name")
+    @clients = Client.order(:name)
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        send_data TimeEntriesCsv.new(@time_entries).generate,
+          filename: "time-entries-#{Date.current.iso8601}.csv",
+          type: "text/csv"
+      end
+    end
   end
 
   def show
@@ -58,5 +68,19 @@ class TimeEntriesController < ApplicationController
 
   def time_entry_params
     params.require(:time_entry).permit(:project_id, :subproject_id, :date, :hours, :description)
+  end
+
+  def filtered_time_entries
+    scope = TimeEntry.includes(project: :client).recent
+    scope = scope.where(projects: { client_id: params[:client_id] }) if params[:client_id].present?
+    scope = scope.where(project_id: params[:project_id]) if params[:project_id].present?
+    if params[:start_date].present? && params[:end_date].present?
+      scope = scope.for_date_range(params[:start_date], params[:end_date])
+    elsif params[:start_date].present?
+      scope = scope.where("date >= ?", params[:start_date])
+    elsif params[:end_date].present?
+      scope = scope.where("date <= ?", params[:end_date])
+    end
+    scope
   end
 end

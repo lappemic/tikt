@@ -3,6 +3,7 @@
 <div class="page-header">
   <h1 class="page-header__title"><%= @project.name %></h1>
   <div class="page-header__actions">
+    <%= link_to "Download CSV", time_entries_path(format: :csv, project_id: @project.id), class: "btn btn--secondary" %>
     <%= link_to "Edit", edit_project_path(@project), class: "btn btn--secondary" %>
     <%= link_to "New Subproject", new_project_subproject_path(@project), class: "btn btn--primary" %>
   </div>
