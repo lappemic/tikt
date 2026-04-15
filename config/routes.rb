@@ -3,7 +3,10 @@ Rails.application.routes.draw do
 
   resources :clients do
     resources :projects, shallow: true do
-      resources :subprojects, shallow: true
+      # Exclude :index — SubprojectsController has no index action, and
+      # GET /projects/:id/subprojects is owned by ProjectsController#subprojects
+      # below (used by the time-entry form to populate subprojects via JSON).
+      resources :subprojects, shallow: true, except: [ :index ]
       resources :billings, only: [:create, :destroy], shallow: true
     end
   end
