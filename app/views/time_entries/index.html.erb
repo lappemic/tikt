@@ -23,16 +23,14 @@
     <%= form_with url: time_entries_path(format: :csv), method: :get, class: "form-inline", local: true do |f| %>
       <div class="form-group" style="flex: 2;">
         <%= f.label :client_id, "Client", class: "form-label" %>
-        <%= f.select :client_id,
-            @clients.map { |c| [c.name, c.id] },
+        <%= f.collection_select :client_id, @clients, :id, :name,
             { include_blank: "All clients", selected: params[:client_id] },
             { class: "form-select" } %>
       </div>
 
       <div class="form-group" style="flex: 2;">
         <%= f.label :project_id, "Project", class: "form-label" %>
-        <%= f.select :project_id,
-            @projects.map { |p| ["#{p.client.name} / #{p.name}", p.id] },
+        <%= f.collection_select :project_id, @projects, :id, ->(p) { "#{p.client.name} / #{p.name}" },
             { include_blank: "All projects", selected: params[:project_id] },
             { class: "form-select" } %>
       </div>

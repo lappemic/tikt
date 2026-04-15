@@ -74,13 +74,6 @@ class TimeEntriesController < ApplicationController
     scope = TimeEntry.includes(project: :client).recent
     scope = scope.where(projects: { client_id: params[:client_id] }) if params[:client_id].present?
     scope = scope.where(project_id: params[:project_id]) if params[:project_id].present?
-    if params[:start_date].present? && params[:end_date].present?
-      scope = scope.for_date_range(params[:start_date], params[:end_date])
-    elsif params[:start_date].present?
-      scope = scope.where("date >= ?", params[:start_date])
-    elsif params[:end_date].present?
-      scope = scope.where("date <= ?", params[:end_date])
-    end
-    scope
+    scope.where(date: params[:start_date].presence..params[:end_date].presence)
   end
 end
