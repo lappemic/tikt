@@ -15,6 +15,41 @@
   </div>
 </div>
 
+<div class="card mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Export</h2>
+  </div>
+  <div class="card__body">
+    <%= form_with url: time_entries_path(format: :csv), method: :get, class: "form-inline", local: true do |f| %>
+      <div class="form-group" style="flex: 2;">
+        <%= f.label :client_id, "Client", class: "form-label" %>
+        <%= f.collection_select :client_id, @clients, :id, :name,
+            { include_blank: "All clients", selected: params[:client_id] },
+            { class: "form-select" } %>
+      </div>
+
+      <div class="form-group" style="flex: 2;">
+        <%= f.label :project_id, "Project", class: "form-label" %>
+        <%= f.collection_select :project_id, @projects, :id, ->(p) { "#{p.client.name} / #{p.name}" },
+            { include_blank: "All projects", selected: params[:project_id] },
+            { class: "form-select" } %>
+      </div>
+
+      <div class="form-group" style="flex: 1; min-width: 140px;">
+        <%= f.label :start_date, "From", class: "form-label" %>
+        <%= f.date_field :start_date, value: params[:start_date], class: "form-input" %>
+      </div>
+
+      <div class="form-group" style="flex: 1; min-width: 140px;">
+        <%= f.label :end_date, "To", class: "form-label" %>
+        <%= f.date_field :end_date, value: params[:end_date], class: "form-input" %>
+      </div>
+
+      <%= f.submit "Download CSV", class: "btn btn--primary" %>
+    <% end %>
+  </div>
+</div>
+
 <div class="card card--flush">
   <div class="card__header">
     <h2 class="card__title">All Entries</h2>

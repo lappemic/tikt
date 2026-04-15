@@ -3,7 +3,17 @@ class TimeEntriesController < ApplicationController
 
   def index
     @time_entries = TimeEntry.includes(project: :client).recent
-    @projects = Project.active.includes(:client).order(:name)
+    @projects = Project.active.includes(:client).order("clients.name, projects.name")
+    @clients = Client.order(:name)
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        send_data TimeEntriesCsv.new(filtered_time_entries).generate,
+          filename: "time-entries-#{Date.current.iso8601}.csv",
+          type: "text/csv"
+      end
+    end
   end
 
   def show
@@ -58,5 +68,21 @@ class TimeEntriesController < ApplicationController
 
   def time_entry_params
     params.require(:time_entry).permit(:project_id, :subproject_id, :date, :hours, :description)
+  end
+
+  def filtered_time_entries
+    scope = TimeEntry.includes(project: :client).recent
+    if params[:project_id].present?
+      scope = scope.where(project_id: params[:project_id])
+    elsif params[:client_id].present?
+      scope = scope.where(projects: { client_id: params[:client_id] })
+    end
+    scope.where(date: parse_date(params[:start_date])..parse_date(params[:end_date]))
+  end
+
+  def parse_date(value)
+    Date.parse(value) if value.present?
+  rescue ArgumentError
+    nil
   end
 end
