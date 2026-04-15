@@ -2,14 +2,14 @@ class TimeEntriesController < ApplicationController
   before_action :set_time_entry, only: %i[show edit update destroy]
 
   def index
-    @time_entries = filtered_time_entries
+    @time_entries = TimeEntry.includes(project: :client).recent
     @projects = Project.active.includes(:client).order("clients.name, projects.name")
     @clients = Client.order(:name)
 
     respond_to do |format|
       format.html
       format.csv do
-        send_data TimeEntriesCsv.new(@time_entries).generate,
+        send_data TimeEntriesCsv.new(filtered_time_entries).generate,
           filename: "time-entries-#{Date.current.iso8601}.csv",
           type: "text/csv"
       end
@@ -72,8 +72,17 @@ class TimeEntriesController < ApplicationController
 
   def filtered_time_entries
     scope = TimeEntry.includes(project: :client).recent
-    scope = scope.where(projects: { client_id: params[:client_id] }) if params[:client_id].present?
-    scope = scope.where(project_id: params[:project_id]) if params[:project_id].present?
-    scope.where(date: params[:start_date].presence..params[:end_date].presence)
+    if params[:project_id].present?
+      scope = scope.where(project_id: params[:project_id])
+    elsif params[:client_id].present?
+      scope = scope.where(projects: { client_id: params[:client_id] })
+    end
+    scope.where(date: parse_date(params[:start_date])..parse_date(params[:end_date]))
+  end
+
+  def parse_date(value)
+    Date.parse(value) if value.present?
+  rescue ArgumentError
+    nil
   end
 end
