@@ -93,6 +93,17 @@ class InvoicesControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_total, invoice.reload.total_cents
   end
 
+  test "destroying a non-draft invoice is blocked" do
+    invoice = invoices(:two) # sent
+
+    assert_no_difference -> { Invoice.count } do
+      delete invoice_url(invoice)
+    end
+
+    assert_redirected_to invoice_url(invoice)
+    assert Invoice.exists?(invoice.id)
+  end
+
   test "update can remove a line item and release its time entry" do
     invoice = invoices(:one)
     item = invoice.line_items.first

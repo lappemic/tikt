@@ -1,6 +1,6 @@
 class InvoicesController < ApplicationController
   before_action :set_invoice, only: %i[show edit update destroy send_invoice mark_billed mark_paid]
-  before_action :ensure_draft, only: %i[edit update]
+  before_action :ensure_draft, only: %i[edit update destroy]
 
   def index
     @invoices = Invoice.includes(:client, :line_items).recent
@@ -82,7 +82,7 @@ class InvoicesController < ApplicationController
   def ensure_draft
     return if @invoice.draft?
 
-    redirect_to @invoice, alert: "Only draft invoices can be edited."
+    redirect_to @invoice, alert: "Only draft invoices can be edited or deleted."
   end
 
   def invoice_params
