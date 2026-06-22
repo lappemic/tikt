@@ -50,6 +50,10 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
+  # Pin to 5.x: minitest 6 is incompatible with Rails 8.1's test runner
+  # (railties line_filtering passes 3 args to Minitest::Runnable#run).
+  gem "minitest", "~> 5.25"
+
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
 
