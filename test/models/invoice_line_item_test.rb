@@ -19,6 +19,14 @@ class InvoiceLineItemTest < ActiveSupport::TestCase
     assert_equal 30_000, item.total_cents
   end
 
+  test "calculate_total rounds fractional cents instead of truncating" do
+    item = invoice_line_items(:one)
+    item.quantity = 0.29
+    item.unit_price_cents = 100 # 0.29 * 100 = 28.9999.. -> 29, not 28
+    item.valid?
+    assert_equal 29, item.total_cents
+  end
+
   test "destroying a line item marks its time entry as uninvoiced" do
     item = invoice_line_items(:one)
     entry = item.time_entry

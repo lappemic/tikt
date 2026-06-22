@@ -28,7 +28,7 @@ class InvoiceLineItem < ApplicationRecord
   private
 
   def calculate_total
-    self.total_cents = (quantity.to_f * unit_price_cents.to_i).to_i
+    self.total_cents = (quantity.to_f * unit_price_cents.to_i).round
   end
 
   def update_invoice_total
