@@ -12,7 +12,7 @@
     <div class="stat__label">Projects</div>
   </div>
   <div class="stat">
-    <div class="stat__value"><%= @recent_invoices.count { |i| i.sent? || i.overdue? } %></div>
+    <div class="stat__value"><%= @recent_invoices.count { |i| i.issued? || i.overdue? } %></div>
     <div class="stat__label">Open Invoices</div>
   </div>
 </div>

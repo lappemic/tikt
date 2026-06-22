@@ -11,6 +11,7 @@
   <%= link_to "All", invoices_path, class: "btn #{@status_filter.nil? ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
   <%= link_to "Draft", invoices_path(status: "draft"), class: "btn #{@status_filter == 'draft' ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
   <%= link_to "Sent", invoices_path(status: "sent"), class: "btn #{@status_filter == 'sent' ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
+  <%= link_to "Billed", invoices_path(status: "billed"), class: "btn #{@status_filter == 'billed' ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
   <%= link_to "Paid", invoices_path(status: "paid"), class: "btn #{@status_filter == 'paid' ? 'btn--primary' : 'btn--ghost'} btn--sm" %>
 </div>
 

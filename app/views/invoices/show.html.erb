@@ -5,8 +5,13 @@
   <div class="page-header__actions">
     <% if @invoice.draft? %>
       <%= link_to "Edit", edit_invoice_path(@invoice), class: "btn btn--secondary" %>
-      <%= button_to "Send Invoice", send_invoice_invoice_path(@invoice), method: :post, class: "btn btn--primary", data: { turbo_confirm: "Send this invoice to #{@invoice.client.email}?" } %>
-    <% elsif @invoice.sent? %>
+      <% if @invoice.can_bill? %>
+        <%= button_to "Mark as Billed", mark_billed_invoice_path(@invoice), method: :post, class: "btn btn--secondary", data: { turbo_confirm: "Mark this invoice as already billed without sending it?" } %>
+      <% end %>
+      <% if @invoice.can_send? %>
+        <%= button_to "Send Invoice", send_invoice_invoice_path(@invoice), method: :post, class: "btn btn--primary", data: { turbo_confirm: "Send this invoice to #{@invoice.client.email}?" } %>
+      <% end %>
+    <% elsif @invoice.issued? %>
       <%= button_to "Mark as Paid", mark_paid_invoice_path(@invoice), method: :post, class: "btn btn--primary" %>
     <% end %>
   </div>

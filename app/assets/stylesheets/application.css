@@ -452,6 +452,27 @@ a:hover {
   padding: var(--space-2) var(--space-3);
 }
 
+/* Editable line items (invoice edit) */
+.line-items .line-item__input {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.line-items .line-item__input--num {
+  width: 7rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
+.line-item--removed {
+  opacity: 0.45;
+}
+
+.line-item--removed .line-item__input {
+  text-decoration: line-through;
+}
+
 /* --------------------------------------------------------------------------
    Cards
    -------------------------------------------------------------------------- */
@@ -545,6 +566,11 @@ a:hover {
 .badge--sent {
   background: var(--color-info-bg);
   color: var(--color-info);
+}
+
+.badge--billed {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .badge--paid {

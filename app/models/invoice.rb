@@ -1,8 +1,9 @@
 class Invoice < ApplicationRecord
   belongs_to :client
   has_many :line_items, class_name: "InvoiceLineItem", dependent: :destroy
+  accepts_nested_attributes_for :line_items, allow_destroy: true
 
-  enum :status, { draft: "draft", sent: "sent", paid: "paid" }
+  enum :status, { draft: "draft", sent: "sent", billed: "billed", paid: "paid" }
 
   validates :number, presence: true, uniqueness: true
   validates :issued_at, presence: true
@@ -30,8 +31,24 @@ class Invoice < ApplicationRecord
     draft? && line_items.any?
   end
 
+  # Marking an invoice as already billed is, like sending, a finalization step
+  # available only from draft.
+  def can_bill?
+    draft? && line_items.any?
+  end
+
+  # True once the invoice has been issued to the client (emailed or billed
+  # externally) and is awaiting payment. Used to gate the "Mark as Paid" flow.
+  def issued?
+    sent? || billed?
+  end
+
   def mark_as_sent!
     update!(status: :sent)
+  end
+
+  def mark_as_billed!
+    update!(status: :billed)
   end
 
   def mark_as_paid!
