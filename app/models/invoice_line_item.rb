@@ -11,13 +11,14 @@ class InvoiceLineItem < ApplicationRecord
 
   after_save :update_invoice_total
   after_destroy :update_invoice_total
+  after_destroy :release_time_entry
 
   def unit_price
     unit_price_cents / 100.0
   end
 
   def unit_price=(value)
-    self.unit_price_cents = (value.to_f * 100).to_i
+    self.unit_price_cents = (value.to_f * 100).round
   end
 
   def total
@@ -27,10 +28,15 @@ class InvoiceLineItem < ApplicationRecord
   private
 
   def calculate_total
-    self.total_cents = (quantity.to_f * unit_price_cents.to_i).to_i
+    self.total_cents = (quantity.to_f * unit_price_cents.to_i).round
   end
 
   def update_invoice_total
-    invoice.recalculate_total!
+    invoice.recalculate_total! unless invoice.destroyed?
+  end
+
+  # When a line item is removed, its source time entry becomes billable again.
+  def release_time_entry
+    time_entry&.update!(invoiced: false)
   end
 end

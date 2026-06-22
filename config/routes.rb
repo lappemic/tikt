@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   resources :invoices do
     member do
       post :send_invoice
+      post :mark_billed
       post :mark_paid
     end
   end

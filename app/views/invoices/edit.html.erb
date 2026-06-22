@@ -4,12 +4,12 @@
   <h1 class="page-header__title">Edit Invoice <%= @invoice.number %></h1>
 </div>
 
-<div class="card mb-6">
-  <div class="card__header">
-    <h2 class="card__title">Invoice Details</h2>
-  </div>
-  <div class="card__body">
-    <%= form_with model: @invoice do |f| %>
+<%= form_with model: @invoice, data: { controller: "invoice-line-items" } do |f| %>
+  <div class="card mb-6">
+    <div class="card__header">
+      <h2 class="card__title">Invoice Details</h2>
+    </div>
+    <div class="card__body">
       <div class="form-row">
         <div class="form-group">
           <%= f.label :issued_at, "Issue Date", class: "form-label" %>
@@ -26,50 +26,78 @@
         <%= f.label :notes, class: "form-label" %>
         <%= f.text_area :notes, class: "form-textarea", rows: 3, placeholder: "Payment terms, thank you message, etc..." %>
       </div>
+    </div>
+  </div>
 
-      <div class="flex gap-2">
-        <%= f.submit "Save Changes", class: "btn btn--primary" %>
-        <%= link_to "Cancel", @invoice, class: "btn btn--secondary" %>
+  <div class="card card--flush mb-6">
+    <div class="card__header">
+      <h2 class="card__title">Line Items</h2>
+      <p class="text-muted text-sm">Adjust hours, rate or description to change the invoiced amount.</p>
+    </div>
+    <div class="table-wrapper">
+      <table class="table line-items">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="num">Hours</th>
+            <th class="num">Rate</th>
+            <th class="num">Amount</th>
+            <th class="num">Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= f.fields_for :line_items do |lf| %>
+            <tr data-invoice-line-items-target="row">
+              <td>
+                <%= lf.text_field :description, class: "form-input line-item__input" %>
+              </td>
+              <td class="num">
+                <%= lf.number_field :quantity, step: 0.01, min: 0, class: "form-input line-item__input line-item__input--num",
+                      data: { line_item: "quantity", action: "input->invoice-line-items#recalculate" } %>
+              </td>
+              <td class="num">
+                <%= lf.number_field :unit_price, step: 0.01, min: 0, class: "form-input line-item__input line-item__input--num",
+                      data: { line_item: "rate", action: "input->invoice-line-items#recalculate" } %>
+              </td>
+              <td class="num" data-line-item="amount"><%= number_to_currency(lf.object.total) %></td>
+              <td class="num">
+                <%= lf.check_box :_destroy, data: { line_item: "destroy", action: "change->invoice-line-items#recalculate" } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="text-right">Total</th>
+            <th class="num" style="font-size: var(--text-lg);" data-invoice-line-items-target="total"><%= number_to_currency(@invoice.total) %></th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div class="card__footer flex gap-2">
+      <%= f.submit "Save Changes", class: "btn btn--primary" %>
+      <%= link_to "Cancel", @invoice, class: "btn btn--secondary" %>
+    </div>
+  </div>
+<% end %>
+
+<div class="card mb-6">
+  <div class="card__header">
+    <h2 class="card__title">Finalize</h2>
+  </div>
+  <div class="card__body">
+    <% if @invoice.line_items.any? %>
+      <div class="flex gap-2" style="flex-wrap: wrap;">
+        <%= button_to "Send Invoice", send_invoice_invoice_path(@invoice), method: :post, class: "btn btn--primary", data: { turbo_confirm: "Send this invoice to #{@invoice.client.email}?" } %>
+        <%= button_to "Mark as Billed", mark_billed_invoice_path(@invoice), method: :post, class: "btn btn--secondary", data: { turbo_confirm: "Mark this invoice as already billed without sending it?" } %>
       </div>
+    <% else %>
+      <p class="text-muted">Add at least one line item before sending or billing this invoice.</p>
     <% end %>
   </div>
-</div>
-
-<div class="card card--flush mb-6">
-  <div class="card__header">
-    <h2 class="card__title">Line Items</h2>
-  </div>
-  <div class="table-wrapper">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th class="num">Hours</th>
-          <th class="num">Rate</th>
-          <th class="num">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @line_items.each do |item| %>
-          <tr>
-            <td><%= item.description %></td>
-            <td class="num"><%= number_with_precision(item.quantity, precision: 2) %></td>
-            <td class="num"><%= number_to_currency(item.unit_price) %></td>
-            <td class="num"><%= number_to_currency(item.total) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-      <tfoot>
-        <tr>
-          <th colspan="3" class="text-right">Total</th>
-          <th class="num" style="font-size: var(--text-lg);"><%= number_to_currency(@invoice.total) %></th>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-  <div class="card__footer flex flex-between flex-center">
-    <span class="text-muted">For <%= @invoice.client.name %></span>
-    <%= button_to "Send Invoice", send_invoice_invoice_path(@invoice), method: :post, class: "btn btn--primary", data: { turbo_confirm: "Send this invoice to #{@invoice.client.email}?" } %>
+  <div class="card__footer">
+    <span class="text-muted">For <%= @invoice.client.name %> — "Mark as Billed" records the invoice as issued without emailing it.</span>
   </div>
 </div>
 

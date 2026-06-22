@@ -2,18 +2,18 @@
 
 one:
   client: one
-  number: MyString
+  number: INV-2025-001
   issued_at: 2025-12-19
-  due_at: 2025-12-19
-  status: MyString
-  notes: MyText
-  total_cents: 1
+  due_at: 2026-01-18
+  status: draft
+  notes: Thank you for your business.
+  total_cents: 150000
 
 two:
   client: two
-  number: MyString
+  number: INV-2025-002
   issued_at: 2025-12-19
-  due_at: 2025-12-19
-  status: MyString
-  notes: MyText
-  total_cents: 1
+  due_at: 2026-01-18
+  status: sent
+  notes: Net 30.
+  total_cents: 240000

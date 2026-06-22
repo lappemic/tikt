@@ -1,13 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  email: MyString
-  address: MyText
-  hourly_rate: 9.99
+  name: Acme Corp
+  email: billing@acme.example
+  address: 123 Main St
+  hourly_rate: 100.00
 
 two:
-  name: MyString
-  email: MyString
-  address: MyText
-  hourly_rate: 9.99
+  name: Globex Inc
+  email: ap@globex.example
+  address: 456 Market St
+  hourly_rate: 120.00

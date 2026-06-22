@@ -3,15 +3,15 @@
 one:
   invoice: one
   time_entry: one
-  description: MyString
-  quantity: 9.99
-  unit_price_cents: 1
-  total_cents: 1
+  description: Consulting
+  quantity: 10.0
+  unit_price_cents: 15000
+  total_cents: 150000
 
 two:
   invoice: two
   time_entry: two
-  description: MyString
-  quantity: 9.99
-  unit_price_cents: 1
-  total_cents: 1
+  description: Development
+  quantity: 20.0
+  unit_price_cents: 12000
+  total_cents: 240000
