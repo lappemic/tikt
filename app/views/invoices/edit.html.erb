@@ -87,7 +87,7 @@
     <h2 class="card__title">Finalize</h2>
   </div>
   <div class="card__body">
-    <% if @invoice.line_items.any? %>
+    <% if @invoice.can_send? %>
       <div class="flex gap-2" style="flex-wrap: wrap;">
         <%= button_to "Send Invoice", send_invoice_invoice_path(@invoice), method: :post, class: "btn btn--primary", data: { turbo_confirm: "Send this invoice to #{@invoice.client.email}?" } %>
         <%= button_to "Mark as Billed", mark_billed_invoice_path(@invoice), method: :post, class: "btn btn--secondary", data: { turbo_confirm: "Mark this invoice as already billed without sending it?" } %>

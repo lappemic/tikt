@@ -28,13 +28,13 @@ class Invoice < ApplicationRecord
   end
 
   def can_send?
-    draft? && line_items.any?
+    finalizable?
   end
 
   # Marking an invoice as already billed is, like sending, a finalization step
   # available only from draft.
   def can_bill?
-    draft? && line_items.any?
+    finalizable?
   end
 
   # True once the invoice has been issued to the client (emailed or billed
@@ -56,6 +56,12 @@ class Invoice < ApplicationRecord
   end
 
   private
+
+  # A draft invoice with at least one line item can be finalized — either
+  # emailed (sent) or recorded as billed externally.
+  def finalizable?
+    draft? && line_items.any?
+  end
 
   def generate_number
     return if number.present?
