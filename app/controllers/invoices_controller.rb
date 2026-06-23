@@ -54,8 +54,8 @@ class InvoicesController < ApplicationController
   def send_invoice
     return redirect_to @invoice, alert: "This invoice can't be sent." unless @invoice.can_send?
 
-    SendInvoiceJob.perform_later(@invoice.id)
     @invoice.mark_as_sent!
+    SendInvoiceJob.perform_later(@invoice.id)
     redirect_to @invoice, notice: "Invoice sent to #{@invoice.client.email}."
   end
 
